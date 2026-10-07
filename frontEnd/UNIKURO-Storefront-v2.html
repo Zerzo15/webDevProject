@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+  <title>WeLo – LifeWear</title>
+
+  <link
+    rel="stylesheet"
+    href="UNIKURO-storefront-v2.css"
+  >
+
+  <style>
+    /* Raster / SVG file images behave like the inline silhouettes */
+    .img img,
+    .th img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .feat img.bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .art img {
+      height: 100%;
+      width: auto;
+      max-width: 33%;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="promo">
+    Free delivery on orders over $50 · Limited offers end Sunday
+  </div>
+
+  <header>
+    <div class="nav">
+
+      <div
+        class="logo"
+        size="100px"
+      >
+        We<br>Lo
+      </div>
+
+      <nav
+        class="tabs"
+        id="tabs"
+        aria-label="Departments"
+      ></nav>
+
+      <div class="tools">
+        <input
+          id="q"
+          placeholder="Search"
+          aria-label="Search products"
+        >
+
+        <button
+          class="wl"
+          onclick="toast(wl.size ? wl.size + ' saved item(s)' : 'Tap the heart on any product to save it')"
+          aria-label="Wishlist"
+        >
+          ♡ <small id="wc">0</small>
+        </button>
+
+        <button
+          class="bag"
+          onclick="openBag()"
+          aria-label="Shopping bag"
+        >
+          <img
+            src="cart-variant.svg"
+            alt="Shopping bag"
+            width="30"
+            height="30"
+          >
+          <b id="cnt">0</b>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="txt">
+      <h1>
+        Simple clothes,<br>
+        made for everyday life.
+      </h1>
+
+      <p>
+        Fine fabrics, clean cuts and colors that go with everything.
+        New autumn essentials are in.
+      </p>
+
+      <button
+        class="cta"
+        onclick="document.getElementById('shop').scrollIntoView({behavior: 'smooth'})"
+      >
+        Shop new arrivals
+      </button>
+    </div>
+
+    <div
+      class="art"
+      id="art"
+      aria-hidden="true"
+    ></div>
+  </section>
+
+  <div
+    class="wrap"
+    id="shop"
+    style="padding-bottom: 0"
+  >
+    <div class="head">
+      <h2>Shop by category</h2>
+
+      <label class="sort">
+        Sort by
+        <select id="sort">
+          <option value="0">Featured</option>
+          <option value="1">Price: low to high</option>
+          <option value="2">Price: high to low</option>
+          <option value="3">Top rated</option>
+        </select>
+      </label>
+    </div>
+
+    <div
+      class="chips"
+      id="chips"
+    ></div>
+  </div>
+
+  <main id="secs"></main>
+
+  <div id="b3"></div>
+
+  <section class="strip">
+    <div>
+      <article>
+        <h3>Free returns</h3>
+        <p>Return anything within 30 days, no questions asked.</p>
+      </article>
+
+      <article>
+        <h3>Made to last</h3>
+        <p>Quality fabrics tested to keep their shape wash after wash.</p>
+      </article>
+
+      <article>
+        <h3>Pick up in store</h3>
+        <p>Order online and collect at your nearest store in 2 hours.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- <footer>© 2026 WeLo — demo storefront inspired by minimal Japanese retail. Not a real shop.</footer> -->
+
+  <div
+    class="ov"
+    id="ov"
+    onclick="closeBag()"
+  ></div>
+
+  <aside
+    class="drawer"
+    id="drawer"
+    aria-label="Shopping bag"
+  >
+    <header>
+      <h3>Your bag</h3>
+
+      <button
+        onclick="closeBag()"
+        aria-label="Close"
+        style="font-size: 22px"
+      >
+        ✕
+      </button>
+    </header>
+
+    <div
+      class="items"
+      id="items"
+    ></div>
+
+    <div class="tot">
+      <div>
+        <span>Total</span>
+        <span id="total">$0.00</span>
+      </div>
+
+      <button
+        class="cta"
+        onclick="toast('Checkout is not part of this demo')"
+      >
+        Check out
+      </button>
+    </div>
+  </aside>
+
+  <div
+    class="toast"
+    id="toast"
+    role="status"
+  ></div>
+
+<script>
+const SH={tee:"M30 14 L10 28 L20 42 L28 37 L28 88 L72 88 L72 37 L80 42 L90 28 L70 14 Q50 27 30 14Z",
+jacket:"M30 12 L8 30 L12 80 L24 78 L28 46 L28 90 L72 90 L72 46 L76 78 L88 80 L92 30 L70 12 Q50 24 30 12Z",
+pants:"M30 10 L70 10 L77 92 L54 92 L50 38 L46 92 L23 92Z",
+skirt:"M36 12 L64 12 L84 88 L16 88Z"};
+const COL={Black:"#1d1d1d",White:"#f7f6f2",Navy:"#23324d",Beige:"#cdb99a",Olive:"#6b7050",Red:"#c4222b",Grey:"#9a9a9a",Pink:"#e9b5be",Blue:"#5f86b8"};
+const D=[
+["Women","Airism Cotton Crew Neck T-Shirt","tee",15,["White","Black","Pink","Beige"],0],
+["Women","Ultra Light Down Jacket","jacket",79,["Black","Navy","Olive"],0],
+["Women","High Waist Wide Pants","pants",39,["Beige","Black","Grey"],20],
+["Women","Pleated Midi Skirt","skirt",35,["Navy","Beige","Black"],0],
+["Women","Soft Fleece Zip Jacket","jacket",29,["Pink","Grey","Blue"],0],
+["Women","Linen Blend Relaxed Tee","tee",25,["White","Olive","Beige"],0],
+["Men","Supima Cotton Oversized Tee","tee",19,["White","Black","Navy","Grey"],0],
+["Men","Smart Ankle Pants","pants",49,["Navy","Black","Beige"],0],
+["Men","Seamless Down Parka","jacket",99,["Black","Olive","Navy"],0],
+["Men","Washed Jersey Relaxed Tee","tee",20,["Olive","Red","Grey"],25],
+["Men","Straight Fit Chino Pants","pants",40,["Beige","Olive","Navy"],0],
+["Men","Fleece Full-Zip Jacket","jacket",30,["Grey","Black","Red"],0],
+["Kids","Crew Neck Short Sleeve Tee","tee",10,["Red","Blue","White"],0],
+["Kids","Warm Padded Jacket","jacket",45,["Pink","Navy","Olive"],30],
+["Kids","Stretch Easy Pants","pants",20,["Navy","Grey","Black"],0],
+
+].map((a,i)=>({id:i,dept:a[0],name:a[1],shape:a[2],price:a[3],cols:a[4],off:a[5],ci:0,rate:(4+((i*7)%10)/10).toFixed(1),rev:40+(i*137)%900}));
+/* ---------- IMAGE SOURCES (optional) ----------
+   Any file type the browser can show works: .svg .png .jpg .jpeg .webp .avif .gif
+   Per product id, use either:
+     - a single path for all colors:   3:"img/skirt.png"
+     - a map per color (+ optional default):  0:{White:"img/tee-white.jpg",Black:"img/tee-black.svg",default:"img/tee.webp"}
+   Anything missing (or a file that fails to load) falls back to the built-in silhouette. */
+const IMAGES={
+  // 0:{White:"img/tee-white.jpg",Black:"img/tee-black.svg"},
+  // 3:"img/pleated-skirt.png",
+};
+/* Optional hero images (any type), e.g. ["img/hero1.jpg","img/hero2.svg","img/hero3.png"] */
+const HERO_IMAGES=[];
+/* Optional banner backgrounds, keys: Women, Men, Kids, Life */
+const FEAT_IMAGES={Women:"images/PXL_20261007_060022334.jpg"
+  // Women:"img/banner-women.jpg", Life:"img/banner-life.svg"
+};
+const $=s=>document.getElementById(s);
+let type="All",n=0,wl=new Set(),cart={};
+const TYPES={All:"All",tee:"T-shirts",jacket:"Outerwear",pants:"Pants",skirt:"Skirts"};
+const SEC={Women:["Women","Layers for the new season","Soft knits, light down and easy trousers."],Men:["Men","Everyday essentials","Well-cut basics that work with everything."],Kids:["Kids","Made for play","Tough, washable clothes in bright colors."]};
+function svg(shape,c){return `<svg viewBox="0 0 100 100" role="img" aria-label="${shape}"><path d="${SH[shape]}" fill="${COL[c]}" stroke="rgba(0,0,0,.18)" stroke-width="1" stroke-linejoin="round"/></svg>`}
+function src(p,c){const m=IMAGES[p.id];if(!m)return null;return typeof m==="string"?m:(m[c]||m.default||null)}
+function esc(t){return String(t).replace(/"/g,"&quot;")}
+function pic(p, c) {
+  const u = src(p, c);
+  if (!u) return svg(p.shape, c);
+
+  return `
+    <img
+      src="${esc(u)}"
+      alt="${esc(p.name + " – " + c)}"
+      loading="lazy"
+      decoding="async"
+      onerror="fb(this, '${p.shape}', '${c}')"
+    >`;
+}
+function fb(el,shape,c){el.outerHTML=svg(shape,c)}
+function sale(p){return p.off?+(p.price*(1-p.off/100)).toFixed(2):p.price}
+function g(shape,c,x,y,sc,rot){return `<path d="${SH[shape]}" fill="${COL[c]}" stroke="rgba(0,0,0,.2)" stroke-width="1.2" transform="translate(${x} ${y}) rotate(${rot||0} 50 50) scale(${sc})"/>`}
+const SCENES={
+Women:`<defs><linearGradient id="gw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6a56b"/><stop offset="1" stop-color="#f3d9b5"/></linearGradient></defs><rect width="1200" height="400" fill="url(#gw)"/><circle cx="900" cy="150" r="90" fill="#fff4d6" opacity=".9"/><path d="M0 300 Q200 220 420 290 T860 270 T1200 300 V400 H0Z" fill="#c9774a"/><path d="M0 350 Q300 290 600 350 T1200 340 V400 H0Z" fill="#8c4a2f"/>${g("jacket","Olive",640,60,2.9,-6)}${g("pants","Beige",880,90,2.6,5)}${g("tee","Pink",1020,150,1.8,10)}`,
+Men:`<defs><linearGradient id="gm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c2a4a"/><stop offset="1" stop-color="#5b6c93"/></linearGradient></defs><rect width="1200" height="400" fill="url(#gm)"/><circle cx="1000" cy="90" r="42" fill="#f4f1e6"/>${[[0,230,80],[90,170,70],[170,260,90],[270,150,60],[340,210,100],[460,120,70],[540,240,80],[630,180,90],[730,260,70],[810,140,80],[900,230,100],[1010,190,70],[1090,250,110]].map(r=>`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${400-r[1]}" fill="#0f1830" opacity=".85"/>`).join("")}<rect y="360" width="1200" height="40" fill="#0a1226"/>${g("jacket","Black",650,50,2.9,-4)}${g("tee","White",880,120,2.2,6)}${g("pants","Beige",1010,90,2.6,-3)}`,
+Kids:`<defs><linearGradient id="gk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f7fd6"/><stop offset="1" stop-color="#7cc8f5"/></linearGradient></defs><rect width="1200" height="400" fill="url(#gk)"/><circle cx="1080" cy="80" r="50" fill="#ffd84a"/><g fill="#fff" opacity=".95"><ellipse cx="520" cy="90" rx="80" ry="26"/><ellipse cx="570" cy="75" rx="50" ry="24"/><ellipse cx="860" cy="150" rx="90" ry="26"/></g><path d="M0 340 Q300 290 600 340 T1200 330 V400 H0Z" fill="#5cc26b"/><path d="M700 330 A150 150 0 0 1 1000 330" fill="none" stroke="#ff6b6b" stroke-width="14"/><path d="M714 330 A136 136 0 0 1 986 330" fill="none" stroke="#ffd84a" stroke-width="14"/><path d="M728 330 A122 122 0 0 1 972 330" fill="none" stroke="#4ecb71" stroke-width="14"/>${g("tee","Red",640,150,1.9,-8)}${g("skirt","Pink",800,140,1.9,6)}${g("jacket","Navy",960,70,2.6,4)}`,
+Life:`<defs><linearGradient id="gl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e60012"/><stop offset="1" stop-color="#a30010"/></linearGradient></defs><rect width="1200" height="400" fill="url(#gl)"/><circle cx="950" cy="200" r="260" fill="#fff" opacity=".07"/><circle cx="1050" cy="260" r="150" fill="#fff" opacity=".07"/>${g("tee","White",780,70,2.6,-5)}${g("jacket","Black",960,60,2.8,6)}`};
+function scene(key) {
+  const u = FEAT_IMAGES[key];
+  if (!u) return sceneSvg(key);
+
+  return `
+    <img
+      class="bg"
+      src="${esc(u)}"
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+      onerror="this.outerHTML = sceneSvg('${key}')"
+    >`;
+}
+
+function sceneSvg(key) {
+  return `
+    <svg
+      viewBox="0 0 1200 400"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >${SCENES[key]}</svg>`;
+}
+
+function feat(key, h, p, btn, target) {
+  return `
+    <section
+      class="feat"
+      aria-label="${h}"
+    >
+      ${scene(key)}
+
+      <div class="in">
+        <h2>${h}</h2>
+        <p>${p}</p>
+
+        <button
+          class="cta"
+          onclick="go('${target}')"
+        >
+          ${btn}
+        </button>
+      </div>
+    </section>`;
+}
+
+function go(id){const e=document.getElementById(id);if(e)e.scrollIntoView({behavior:"smooth"})}
+function card(p) {
+  const c = p.cols[p.ci];
+  const saved = wl.has(p.id);
+
+  const swatches = p.cols.map((k, i) => `
+    <button
+      class="${i === p.ci ? "on" : ""}"
+      style="background: ${COL[k]}"
+      title="${k}"
+      aria-label="${k}"
+      onclick="D[${p.id}].ci = ${i}; draw()"
+    ></button>`).join("");
+
+  return `
+    <article class="p">
+
+      <div class="img">
+        ${p.off ? `<span class="tag">${p.off}% OFF</span>` : ""}
+
+        <button
+          class="heart ${saved ? "on" : ""}"
+          onclick="heart(${p.id})"
+          aria-label="Save"
+        >${saved ? "♥" : "♡"}</button>
+
+        ${pic(p, c)}
+
+        <button
+          class="quick"
+          onclick="add(${p.id})"
+        >
+          Add to bag
+        </button>
+      </div>
+
+      <div
+        class="sw"
+        role="group"
+        aria-label="Colors"
+      >${swatches}
+      </div>
+
+      <div class="cat">${p.dept} · ${c}</div>
+      <div class="n">${p.name}</div>
+
+      <div class="pr ${p.off ? "sale" : ""}">
+        $${sale(p).toFixed(2)}
+        ${p.off ? `<s>$${p.price.toFixed(2)}</s>` : ""}
+      </div>
+
+      <div class="rate">★ ${p.rate} (${p.rev})</div>
+
+    </article>`;
+}
+
+function draw(){
+  $("tabs").innerHTML=["Women","Men","Kids"].map(d=>`<button onclick="go('sec-${d}')">${d}</button>`).join("")+`<button onclick="go('b3')">LifeWear</button>`;
+  $("chips").innerHTML=Object.entries(TYPES).map(([k,v])=>`<button class="${k===type?"on":""}" onclick="type='${k}';draw()">${v}</button>`).join("");
+  const q=$("q").value.trim().toLowerCase(),s=$("sort").value;let html="",any=false;
+  ["Women","Men","Kids"].forEach((d,i)=>{
+    let L=D.filter(p=>p.dept===d&&(type==="All"||p.shape===type)&&(!q||(p.name+d).toLowerCase().includes(q)));
+    if(s==="1")L.sort((a,b)=>sale(a)-sale(b));if(s==="2")L.sort((a,b)=>sale(b)-sale(a));if(s==="3")L.sort((a,b)=>b.rate-a.rate);
+    if(L.length)any=true;
+    html+=`<section class="sec" id="sec-${d}"><div class="head"><div><h2>${SEC[d][0]}</h2><p>${SEC[d][2]}</p></div><span class="sort">${L.length} items</span></div><div class="grid">${L.length?L.map(card).join(""):`<div class="empty">No ${d.toLowerCase()} items match. Clear the search or pick another type.</div>`}</div></section>`;
+    if(i===0)html+=feat("Women","Layers for the new season","Warm tones, soft textures and light down for cooler days.","Shop men","sec-Men");
+    if(i===1)html+=feat("Men","City essentials","Clean basics built for the commute and everything after.","Shop kids","sec-Kids");
+  });
+  $("secs").innerHTML=html;
+  $("b3").innerHTML=feat("Life","LifeWear for everyone","Simple, high-quality clothes that improve everyday life.","Back to top","shop");
+  $("secs").insertAdjacentHTML("beforeend",feat("Kids","Play all day","Washable, durable and ready for the playground.","Shop women","sec-Women").replace('<section class="feat"','<section class="feat" style="margin-top:56px"'));
+}
+function heart(i){wl.has(i)?wl.delete(i):wl.add(i);$("wc").textContent=wl.size;draw()}
+function add(i){const p=D[i],k=i+"-"+p.ci;cart[k]=cart[k]||{id:i,ci:p.ci,q:0};cart[k].q++;bag();toast(`Added ${p.name} (${p.cols[p.ci]}) to your bag`)}
+function bag(){n=Object.values(cart).reduce((a,x)=>a+x.q,0);$("cnt").textContent=n;
+  const E=Object.entries(cart);let t=0;
+  $("items").innerHTML = E.length
+    ? E.map(([k, x]) => {
+        const p = D[x.id];
+        const c = p.cols[x.ci];
+        t += sale(p) * x.q;
+
+        return `
+          <div class="it">
+            <div class="th">${pic(p, c)}</div>
+
+            <div>
+              <div class="n">${p.name}</div>
+              <div class="cat">${c}</div>
+              <div class="pr">$${(sale(p) * x.q).toFixed(2)}</div>
+
+              <div class="qty">
+                <button
+                  onclick="qty('${k}', -1)"
+                  aria-label="Less"
+                >−</button>
+
+                ${x.q}
+
+                <button
+                  onclick="qty('${k}', 1)"
+                  aria-label="More"
+                >+</button>
+              </div>
+            </div>
+          </div>`;
+      }).join("")
+    : `<div class="empty">Your bag is empty. Add something you like.</div>`;
+
+  $("total").textContent="$"+t.toFixed(2)}
+function qty(k,d){cart[k].q+=d;if(cart[k].q<=0)delete cart[k];bag()}
+function openBag(){bag();$("drawer").classList.add("show");$("ov").classList.add("show")}
+function closeBag(){$("drawer").classList.remove("show");$("ov").classList.remove("show")}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeBag()});
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),2000)}
+$("q").addEventListener("input",draw);$("sort").addEventListener("change",draw);
+const HERO_DEFAULT=[["jacket","Olive"],["tee","White"],["pants","Navy"]];
+$("art").innerHTML=HERO_DEFAULT.map((d,i)=>HERO_IMAGES[i]
+  ?`<img src="${esc(HERO_IMAGES[i])}" alt="" onerror="fb(this,'${d[0]}','${d[1]}')">`
+  :svg(d[0],d[1])).join("");
+draw();bag();
+</script>
+</body>
+</html>
