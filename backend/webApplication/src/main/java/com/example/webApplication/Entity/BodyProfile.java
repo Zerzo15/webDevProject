@@ -1,10 +1,9 @@
 package com.example.webApplication.Entity;
 
-import java.time.Instant;
-
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,31 +11,34 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 
-@Entity     
+@Entity
 public class BodyProfile {
-    
-    @Id 
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne  
-    @JoinColumn(name = "user_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE) //this mean when the user delete the account, this data is also wiped away.
-    private User appUser;
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
 
     private String gender;
 
-    private int height_cm;
+    @Column(name = "height_cm")
+    private int heightCm;
 
-    private int weight_kg;
+    @Column(name = "weight_kg")
+    private int weightKg;
 
-    private int bust_cm;
+    @Column(name = "bust_cm")
+    private int bustCm;
 
-    private int hips_cm;
+    @Column(name = "waist_cm")
+    private int waistCm;
 
-    private Instant created_at;
-
-    private Instant updated_at;
+    @Column(name = "hips_cm")
+    private int hipsCm;
 
     public long getId() {
         return id;
@@ -46,12 +48,12 @@ public class BodyProfile {
         this.id = id;
     }
 
-    public User getAppUser() {
-        return appUser;
+    public User getUser() {
+        return user;
     }
 
-    public void setAppUser(User appUser) {
-        this.appUser = appUser;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getGender() {
@@ -62,51 +64,43 @@ public class BodyProfile {
         this.gender = gender;
     }
 
-    public int getHeight_cm() {
-        return height_cm;
+    public int getHeightCm() {
+        return heightCm;
     }
 
-    public void setHeight_cm(int height_cm) {
-        this.height_cm = height_cm;
+    public void setHeightCm(int heightCm) {
+        this.heightCm = heightCm;
     }
 
-    public int getWeight_kg() {
-        return weight_kg;
+    public int getWeightKg() {
+        return weightKg;
     }
 
-    public void setWeight_kg(int weight_kg) {
-        this.weight_kg = weight_kg;
+    public void setWeightKg(int weightKg) {
+        this.weightKg = weightKg;
     }
 
-    public int getBust_cm() {
-        return bust_cm;
+    public int getBustCm() {
+        return bustCm;
     }
 
-    public void setBust_cm(int bust_cm) {
-        this.bust_cm = bust_cm;
+    public void setBustCm(int bustCm) {
+        this.bustCm = bustCm;
     }
 
-    public int getHips_cm() {
-        return hips_cm;
+    public int getWaistCm() {
+        return waistCm;
     }
 
-    public void setHips_cm(int hips_cm) {
-        this.hips_cm = hips_cm;
+    public void setWaistCm(int waistCm) {
+        this.waistCm = waistCm;
     }
 
-    public Instant getCreated_at() {
-        return created_at;
+    public int getHipsCm() {
+        return hipsCm;
     }
 
-    public void setCreated_at(Instant created_at) {
-        this.created_at = created_at;
-    }
-
-    public Instant getUpdated_at() {
-        return updated_at;
-    }
-
-    public void setUpdated_at(Instant updated_at) {
-        this.updated_at = updated_at;
+    public void setHipsCm(int hipsCm) {
+        this.hipsCm = hipsCm;
     }
 }

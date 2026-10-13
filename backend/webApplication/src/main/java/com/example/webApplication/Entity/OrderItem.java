@@ -1,5 +1,7 @@
 package com.example.webApplication.Entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,10 +10,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
-@Entity 
+@Entity
 public class OrderItem {
-    
-    @Id 
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
@@ -20,15 +22,13 @@ public class OrderItem {
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "product_variant_id", nullable = false)
+    private ProductVariant productVariant;
 
     private int quantity;
 
-    @Column(name = "unit_price")
-    private long unit_price;
-
-    private long subtotal;
+    @Column(name = "unit_price", precision = 12, scale = 2)
+    private BigDecimal unitPrice;
 
     public long getId() {
         return id;
@@ -46,12 +46,12 @@ public class OrderItem {
         this.order = order;
     }
 
-    public Product getProduct() {
-        return product;
+    public ProductVariant getProductVariant() {
+        return productVariant;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductVariant(ProductVariant productVariant) {
+        this.productVariant = productVariant;
     }
 
     public int getQuantity() {
@@ -62,19 +62,11 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    public long getUnit_price() {
-        return unit_price;
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setUnit_price(long unit_price) {
-        this.unit_price = unit_price;
-    }
-
-    public long getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(long subtotal) {
-        this.subtotal = subtotal;
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }
