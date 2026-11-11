@@ -1,12 +1,15 @@
 package com.example.webApplication.Dto;
 
+import java.time.Instant;
+
+import com.example.webApplication.Entity.AccountStatus;
 import com.example.webApplication.Entity.UserRoleStatus;
 
 public record UserDto(
     Long id,
-    String last_name,
-    String first_name,
-    UserRoleStatus role
+    String email,
+    UserRoleStatus role,
+    AccountStatus accountStatus,
+    Instant createdAt
 ) {
-
 }

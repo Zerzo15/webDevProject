@@ -1,7 +1,9 @@
 package com.example.webApplication.Entity;
 
-import java.time.Instant;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,22 +13,24 @@ import jakarta.persistence.ManyToOne;
 
 @Entity
 public class OutfitRecommendation {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User appUser;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
 
-    private String context_prompt;
+    @Column(name = "context_prompt")
+    private String contextPrompt;
 
-    private long budget_limit;
+    @Column(name = "ai_response_text")
+    private String aiResponseText;
 
-    private String ai_response_text;
-
-    private Instant created_at;
+    @Column(name = "recommended_variant_ids")
+    private String recommendedVariantIds;
 
     public long getId() {
         return id;
@@ -36,43 +40,35 @@ public class OutfitRecommendation {
         this.id = id;
     }
 
-    public User getAppUser() {
-        return appUser;
+    public User getUser() {
+        return user;
     }
 
-    public void setAppUser(User appUser) {
-        this.appUser = appUser;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public String getContext_prompt() {
-        return context_prompt;
+    public String getContextPrompt() {
+        return contextPrompt;
     }
 
-    public void setContext_prompt(String context_prompt) {
-        this.context_prompt = context_prompt;
+    public void setContextPrompt(String contextPrompt) {
+        this.contextPrompt = contextPrompt;
     }
 
-    public long getBudget_limit() {
-        return budget_limit;
+    public String getAiResponseText() {
+        return aiResponseText;
     }
 
-    public void setBudget_limit(long budget_limit) {
-        this.budget_limit = budget_limit;
+    public void setAiResponseText(String aiResponseText) {
+        this.aiResponseText = aiResponseText;
     }
 
-    public String getAi_response_text() {
-        return ai_response_text;
+    public String getRecommendedVariantIds() {
+        return recommendedVariantIds;
     }
 
-    public void setAi_response_text(String ai_response_text) {
-        this.ai_response_text = ai_response_text;
-    }
-
-    public Instant getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(Instant created_at) {
-        this.created_at = created_at;
+    public void setRecommendedVariantIds(String recommendedVariantIds) {
+        this.recommendedVariantIds = recommendedVariantIds;
     }
 }

@@ -1,11 +1,13 @@
 package com.example.webApplication.Dto;
 
-public record ProductDto(
-    String name,
-    String catagory,
-    Long price,
-    Long stock_quantity,
-    Boolean is_selling
-) {
+import java.math.BigDecimal;
 
+public record ProductDto(
+    Long id,
+    Long categoryId,
+    String name,
+    String description,
+    BigDecimal basePrice,
+    String imageUrl
+) {
 }

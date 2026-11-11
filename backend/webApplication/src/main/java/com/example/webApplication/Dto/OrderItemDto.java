@@ -1,12 +1,12 @@
 package com.example.webApplication.Dto;
 
+import java.math.BigDecimal;
+
 public record OrderItemDto(
     Long id,
-    OrderDto order,
-    ProductDto product,
-    Integer quantity,
-    Long unit_price,
-    Long subtotal
+    Long orderId,
+    Long productVariantId,
+    int quantity,
+    BigDecimal unitPrice
 ) {
-
 }

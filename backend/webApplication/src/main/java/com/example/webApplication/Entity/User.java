@@ -11,29 +11,30 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity 
+@Entity
 @Table(name = "users")
 public class User {
-    
-    @Id 
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "password", nullable = false)
     private String password;
-
-    private String last_name;
-
-    private String first_name;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRoleStatus role = UserRoleStatus.CUSTOMER;
 
-    private Instant create_at;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status", nullable = false)
+    private AccountStatus accountStatus = AccountStatus.ACTIVE;
 
-    private Instant updated_at;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
 
     public long getId() {
         return id;
@@ -51,28 +52,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
+    public String getPasswordHash() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPasswordHash(String password) {
         this.password = password;
-    }
-
-    public String getLast_name() {
-        return last_name;
-    }
-
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
-    }
-
-    public String getFirst_name() {
-        return first_name;
-    }
-
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
     }
 
     public UserRoleStatus getRole() {
@@ -83,19 +68,19 @@ public class User {
         this.role = role;
     }
 
-    public Instant getCreate_at() {
-        return create_at;
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
     }
 
-    public void setCreate_at(Instant create_at) {
-        this.create_at = create_at;
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
 
-    public Instant getUpdated_at() {
-        return updated_at;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setUpdated_at(Instant updated_at) {
-        this.updated_at = updated_at;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 }

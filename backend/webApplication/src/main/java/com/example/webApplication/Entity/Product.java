@@ -1,34 +1,35 @@
 package com.example.webApplication.Entity;
 
-import java.time.Instant;
+import java.math.BigDecimal;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
-@Entity 
+@Entity
 public class Product {
-    
-    @Id 
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     private String name;
 
     private String description;
 
-    private String catagory;
+    @Column(name = "base_price", precision = 12, scale = 2)
+    private BigDecimal basePrice;
 
-    private long price;
-
-    private long stock_quantity;
-
-    private boolean is_selling;
-
-    private Instant created_at;
-
-    private Instant updated_at;
+    @Column(name = "image_url")
+    private String imageUrl;
 
     public long getId() {
         return id;
@@ -36,6 +37,14 @@ public class Product {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public String getName() {
@@ -54,51 +63,19 @@ public class Product {
         this.description = description;
     }
 
-    public String getCatagory() {
-        return catagory;
+    public BigDecimal getBasePrice() {
+        return basePrice;
     }
 
-    public void setCatagory(String catagory) {
-        this.catagory = catagory;
+    public void setBasePrice(BigDecimal basePrice) {
+        this.basePrice = basePrice;
     }
 
-    public long getPrice() {
-        return price;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setPrice(long price) {
-        this.price = price;
-    }
-
-    public long getStock_quantity() {
-        return stock_quantity;
-    }
-
-    public void setStock_quantity(long stock_quantity) {
-        this.stock_quantity = stock_quantity;
-    }
-
-    public boolean isIs_selling() {
-        return is_selling;
-    }
-
-    public void setIs_selling(boolean is_selling) {
-        this.is_selling = is_selling;
-    }
-
-    public Instant getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(Instant created_at) {
-        this.created_at = created_at;
-    }
-
-    public Instant getUpdated_at() {
-        return updated_at;
-    }
-
-    public void setUpdated_at(Instant updated_at) {
-        this.updated_at = updated_at;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
