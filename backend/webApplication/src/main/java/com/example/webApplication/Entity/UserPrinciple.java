@@ -31,18 +31,21 @@ public class UserPrinciple implements UserDetails{
         return user.getPasswordHash();
     }
 
-    //for this 3 function, we just include them because of the rules
+    @Override
+    public boolean isAccountNonLocked() { 
+        return user.getAccountStatus() != AccountStatus.LOCKED; 
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return user.getAccountStatus() == AccountStatus.ACTIVE;
+    }
+
+    //for this 2 function, we just include them because of the rules
     //we are not using them
     @Override
     public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() { return true; }
-
-    @Override
     public boolean isCredentialsNonExpired() { return true; }
-
-    //this can be use to implement a banning system in the future
-    @Override
-    public boolean isEnabled() { return true; }
 }

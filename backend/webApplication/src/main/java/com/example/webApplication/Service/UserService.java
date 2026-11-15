@@ -1,17 +1,30 @@
 package com.example.webApplication.Service;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.time.Instant;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.example.webApplication.Dto.LoginRequest;
 import com.example.webApplication.Dto.RegisterRequest;
+import com.example.webApplication.Dto.TokenRespond;
 import com.example.webApplication.Dto.UserDto;
 import com.example.webApplication.Entity.User;
 import com.example.webApplication.Repository.UserRepo;
 
+@Service 
 public class UserService {
     private final UserRepo userRepo;
-
-    public UserService(UserRepo userRepo) {
+    private final AuthenticationManager authenticationManager;
+    private final JWTService jwtService;
+    
+    public UserService(UserRepo userRepo, JWTService jwtService, AuthenticationManager authenticationManager) {
         this.userRepo = userRepo;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
     }
 
     //hash the password 7 times before saving it inside the db
@@ -21,6 +34,7 @@ public class UserService {
         User user = new User();
 
         String email = request.email();
+        String phone = request.phone();
         String password = request.password();
 
         if (email == null || email.trim().isEmpty()) {
@@ -38,20 +52,52 @@ public class UserService {
 
         user.setEmail(email);
 
+        phone = phone.trim();
+        String cleanPhone = phone.replaceAll("[\\s\\-]", "");
+
+        if (!cleanPhone.matches("^\\+?[0-9]{9,15}$")) {
+            throw new Exception("Error: Invalid Phone Number Format");
+        }
+
+        if (userRepo.existsByPhone(cleanPhone)) {
+            throw new Exception("error: Phone number in used");
+        }
+
+        user.setPhone(cleanPhone);
+
         if (password == null || password.trim().isEmpty() || password.length() <= 8) {
             throw new Exception("error: Provide a secure email");
         }
 
         user.setPasswordHash(encoder.encode(password));
 
+        user.setCreatedAt(Instant.now());
+
         User savedUser = userRepo.save(user);
 
         return new UserDto(
             savedUser.getId(),
             savedUser.getEmail(),
+            savedUser.getPhone(),
             savedUser.getRole(),
             savedUser.getAccountStatus(),
             savedUser.getCreatedAt()
         ); 
+    }
+
+    public TokenRespond loginUser(LoginRequest request) {
+        var authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.loginId(), request.password())
+        );
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        String username = userDetails.getUsername();
+
+        String role = userDetails.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
+
+        String token = jwtService.generateToken(username, role);
+        
+        return new TokenRespond(token);
     }
 }

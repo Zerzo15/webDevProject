@@ -8,6 +8,7 @@ import com.example.webApplication.Entity.UserRoleStatus;
 public record UserDto(
     Long id,
     String email,
+    String phone,
     UserRoleStatus role,
     AccountStatus accountStatus,
     Instant createdAt
