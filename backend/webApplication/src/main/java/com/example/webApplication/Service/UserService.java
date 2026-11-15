@@ -1,6 +1,7 @@
 package com.example.webApplication.Service;
 
 import java.time.Instant;
+import java.util.Locale;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,7 +42,7 @@ public class UserService {
             throw new Exception("error: Provide an Email");
         }
 
-        email = email.trim();
+        email = email.trim().toLowerCase(Locale.ROOT);
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             throw new Exception("error: Invalid Email format");
         }
@@ -52,7 +53,9 @@ public class UserService {
 
         user.setEmail(email);
 
-        phone = phone.trim();
+        if (phone == null || phone.trim().isEmpty()) {
+            throw new Exception("error: Provide an Phone number");
+        }
         String cleanPhone = phone.replaceAll("[\\s\\-]", "");
 
         if (!cleanPhone.matches("^\\+?[0-9]{9,15}$")) {
@@ -66,7 +69,7 @@ public class UserService {
         user.setPhone(cleanPhone);
 
         if (password == null || password.trim().isEmpty() || password.length() <= 8) {
-            throw new Exception("error: Provide a secure email");
+            throw new Exception("error: Provide a secure password");
         }
 
         user.setPasswordHash(encoder.encode(password));
