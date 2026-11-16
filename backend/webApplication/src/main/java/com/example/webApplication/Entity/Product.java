@@ -1,81 +1,56 @@
 package com.example.webApplication.Entity;
 
 import java.math.BigDecimal;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
-public class Product {
+@Table(
+    name = "products", 
+    indexes = {
+        @Index(name = "idx_products_category_id", columnList = "category_id"),
+        @Index(name = "idx_products_slug", columnList = "slug")},
+    check = @CheckConstraint(constraint = "base_price >= 0 AND weight_grams >= 0")
+    )
+public class Product extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Column(nullable = false, length = 150)
     private String name;
 
+    @Column(nullable = false, unique = true, length = 180)
+    private String slug;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "base_price", precision = 12, scale = 2)
+    @Column(length = 100)
+    private String brand;
+
+    @Column(length = 100)
+    private String material;
+
+    @Column(name = "base_price", nullable = false, precision = 12, scale = 2)
     private BigDecimal basePrice;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "weight_grams", nullable = false)
+    private int weightGrams = 0;
 
-    public long getId() {
-        return id;
-    }
+    // Reference to Cloud Storage bucket URL
+    @Column(name = "image_url", length = 500)
+    private String imageUrl; 
 
-    public void setId(long id) {
-        this.id = id;
-    }
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getBasePrice() {
-        return basePrice;
-    }
-
-    public void setBasePrice(BigDecimal basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 }

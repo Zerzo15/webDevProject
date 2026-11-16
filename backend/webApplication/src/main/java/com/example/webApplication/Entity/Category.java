@@ -1,34 +1,43 @@
 package com.example.webApplication.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "categories")
-public class Category {
+@Table(name = "categories", indexes = {
+    @Index(name = "idx_categories_slug", columnList = "slug")
+})
+public class Category extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false, length = 100)
     private String name;
 
-    public long getId() {
-        return id;
-    }
+    @Column(nullable = false, unique = true, length = 120)
+    private String slug;
 
-    public void setId(long id) {
-        this.id = id;
-    }
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
-    public String getName() {
-        return name;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private Category parent;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    @Column(name = "display_order", nullable = false)
+    private int displayOrder = 0;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
+
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getSlug() { return slug; }
+    public void setSlug(String slug) { this.slug = slug; }
 }
