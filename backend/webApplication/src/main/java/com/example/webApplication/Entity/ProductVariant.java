@@ -1,5 +1,6 @@
 package com.example.webApplication.Entity;
 
+import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,9 +8,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "product_variants")
+@Table(
+    name = "product_variants",
+    check = @CheckConstraint(constraint = "stock_quantity >= 0")
+)
+
 public class ProductVariant {
 
     @Id
@@ -18,6 +26,7 @@ public class ProductVariant {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Product product;
 
     private String size;
@@ -25,6 +34,9 @@ public class ProductVariant {
     private String color;
 
     private int stockQuantity;
+
+    @Version
+    private Long version;
 
     public long getId() {
         return id;
@@ -64,5 +76,13 @@ public class ProductVariant {
 
     public void setStockQuantity(int stockQuantity) {
         this.stockQuantity = stockQuantity;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }
