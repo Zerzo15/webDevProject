@@ -6,9 +6,8 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(
-    name = "vouchers", 
+    name = "vouchers",
     indexes = {
-        @Index(name = "idx_vouchers_code", columnList = "code"),
         @Index(name = "idx_vouchers_active_dates", columnList = "is_active, start_date, end_date")},
     check = {@CheckConstraint(constraint = "discount_value >= 0 AND min_order_amount >= 0 AND end_date > start_date AND (type <> 'PERCENT' OR discount_value <= 100)")}
     )
@@ -52,4 +51,24 @@ public class Voucher extends Auditable {
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+    public VoucherType getType() { return type; }
+    public void setType(VoucherType type) { this.type = type; }
+    public BigDecimal getDiscountValue() { return discountValue; }
+    public void setDiscountValue(BigDecimal discountValue) { this.discountValue = discountValue; }
+    public BigDecimal getMaxDiscountAmount() { return maxDiscountAmount; }
+    public void setMaxDiscountAmount(BigDecimal maxDiscountAmount) { this.maxDiscountAmount = maxDiscountAmount; }
+    public BigDecimal getMinOrderAmount() { return minOrderAmount; }
+    public void setMinOrderAmount(BigDecimal minOrderAmount) { this.minOrderAmount = minOrderAmount; }
+    public Instant getStartDate() { return startDate; }
+    public void setStartDate(Instant startDate) { this.startDate = startDate; }
+    public Instant getEndDate() { return endDate; }
+    public void setEndDate(Instant endDate) { this.endDate = endDate; }
+    public int getUsageLimit() { return usageLimit; }
+    public void setUsageLimit(int usageLimit) { this.usageLimit = usageLimit; }
+    public int getUsedCount() { return usedCount; }
+    public void setUsedCount(int usedCount) { this.usedCount = usedCount; }
+    public boolean isActive() { return isActive; }
+    public void setActive(boolean active) { isActive = active; }
 }

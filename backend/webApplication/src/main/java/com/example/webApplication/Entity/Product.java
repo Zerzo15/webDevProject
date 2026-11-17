@@ -1,14 +1,15 @@
 package com.example.webApplication.Entity;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 import jakarta.persistence.*;
 
 @Entity
 @Table(
     name = "products", 
     indexes = {
-        @Index(name = "idx_products_category_id", columnList = "category_id"),
-        @Index(name = "idx_products_slug", columnList = "slug")},
+        @Index(name = "idx_products_category_id", columnList = "category_id")},
     check = @CheckConstraint(constraint = "base_price >= 0 AND weight_grams >= 0")
     )
 public class Product extends Auditable {
@@ -49,8 +50,36 @@ public class Product extends Auditable {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "product_tags",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
+
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
+    public String getSlug() { return slug; }
+    public void setSlug(String slug) { this.slug = slug; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getBrand() { return brand; }
+    public void setBrand(String brand) { this.brand = brand; }
+    public String getMaterial() { return material; }
+    public void setMaterial(String material) { this.material = material; }
+    public BigDecimal getBasePrice() { return basePrice; }
+    public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; }
+    public int getWeightGrams() { return weightGrams; }
+    public void setWeightGrams(int weightGrams) { this.weightGrams = weightGrams; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public boolean isActive() { return isActive; }
+    public void setActive(boolean active) { isActive = active; }
+    public Set<Tag> getTags() { return tags; }
+    public void setTags(Set<Tag> tags) { this.tags = tags; }
 }

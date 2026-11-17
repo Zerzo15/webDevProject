@@ -6,12 +6,14 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.SQLRestriction;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+@SQLRestriction("deleted_at IS NULL")
 public abstract class Auditable {
 
     @CreatedDate

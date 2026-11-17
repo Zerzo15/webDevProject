@@ -24,7 +24,7 @@ public class OtpCode {
     @Column(nullable = false, length = 150)
     private String email;
 
-    @Column(nullable = false, length = 6)
+    @Column(nullable = false, length = 60)
     private String code;
 
     @Column(name = "expires_at", nullable = false)

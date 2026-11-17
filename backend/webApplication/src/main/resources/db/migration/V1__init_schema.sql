@@ -62,7 +62,6 @@ CREATE TABLE `vouchers` (
   `used_count` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK30ftp2biebbvpik8e49wlmady` (`code`),
-  KEY `idx_vouchers_code` (`code`),
   KEY `idx_vouchers_active_dates` (`is_active`,`start_date`,`end_date`),
   CONSTRAINT `vouchers_chk_1` CHECK (((`discount_value` >= 0) and (`min_order_amount` >= 0) and (`end_date` > `start_date`) and ((`type` <> _utf8mb4'PERCENT') or (`discount_value` <= 100))))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -120,7 +119,6 @@ CREATE TABLE `categories` (
   `parent_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UKoul14ho7bctbefv8jywp5v3i2` (`slug`),
-  KEY `idx_categories_slug` (`slug`),
   KEY `FKsaok720gsu4u2wrgbk10b5n8d` (`parent_id`),
   CONSTRAINT `FKsaok720gsu4u2wrgbk10b5n8d` FOREIGN KEY (`parent_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -161,7 +159,7 @@ CREATE TABLE `orders` (
 
 CREATE TABLE `otp_codes` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `code` varchar(6) NOT NULL,
+  `code` varchar(60) NOT NULL,
   `created_at` datetime(6) NOT NULL,
   `email` varchar(150) NOT NULL,
   `expires_at` datetime(6) NOT NULL,
@@ -211,7 +209,6 @@ CREATE TABLE `products` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UKostq1ec3toafnjok09y9l7dox` (`slug`),
   KEY `idx_products_category_id` (`category_id`),
-  KEY `idx_products_slug` (`slug`),
   CONSTRAINT `FKog2rp4qthbtt2lfyhfo32lsw9` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
   CONSTRAINT `products_chk_1` CHECK (((`base_price` >= 0) and (`weight_grams` >= 0)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -229,7 +226,6 @@ CREATE TABLE `refresh_tokens` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UKo2mlirhldriil2y7krapq4frt` (`token_hash`),
   KEY `idx_refresh_tokens_user_id` (`user_id`),
-  KEY `idx_refresh_tokens_token_hash` (`token_hash`),
   CONSTRAINT `FK1lih5y2npsf8u5o3vhdb9y0os` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -276,9 +272,11 @@ CREATE TABLE `product_variants` (
   `size` varchar(255) DEFAULT NULL,
   `stock_quantity` int NOT NULL,
   `product_id` bigint NOT NULL,
+  `version` bigint NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `FKosqitn4s405cynmhb87lkvuau` (`product_id`),
-  CONSTRAINT `FKosqitn4s405cynmhb87lkvuau` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
+  CONSTRAINT `FKosqitn4s405cynmhb87lkvuau` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `product_variants_chk_1` CHECK ((`stock_quantity` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -316,7 +314,18 @@ CREATE TABLE `order_items` (
   KEY `FKt4dc2r9nbvbujrljv3e23iibt` (`order_id`),
   KEY `FK1n92a16igj05dvyfl9c107xoc` (`product_variant_id`),
   CONSTRAINT `FK1n92a16igj05dvyfl9c107xoc` FOREIGN KEY (`product_variant_id`) REFERENCES `product_variants` (`id`),
-  CONSTRAINT `FKt4dc2r9nbvbujrljv3e23iibt` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`)
+  CONSTRAINT `FKt4dc2r9nbvbujrljv3e23iibt` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- web_db.product_tags definition
+
+CREATE TABLE `product_tags` (
+  `product_id` bigint NOT NULL,
+  `tag_id` bigint NOT NULL,
+  PRIMARY KEY (`product_id`, `tag_id`),
+  CONSTRAINT `FK_product_tags_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_product_tags_tag` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

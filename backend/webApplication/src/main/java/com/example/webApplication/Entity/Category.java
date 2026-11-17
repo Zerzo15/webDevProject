@@ -5,9 +5,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "categories", indexes = {
-    @Index(name = "idx_categories_slug", columnList = "slug")
-})
+@Table(name = "categories")
 public class Category extends Auditable {
 
     @Id
@@ -40,4 +38,12 @@ public class Category extends Auditable {
     public void setName(String name) { this.name = name; }
     public String getSlug() { return slug; }
     public void setSlug(String slug) { this.slug = slug; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public Category getParent() { return parent; }
+    public void setParent(Category parent) { this.parent = parent; }
+    public int getDisplayOrder() { return displayOrder; }
+    public void setDisplayOrder(int displayOrder) { this.displayOrder = displayOrder; }
+    public boolean isActive() { return isActive; }
+    public void setActive(boolean active) { isActive = active; }
 }
