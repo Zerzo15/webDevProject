@@ -1,7 +1,10 @@
 package com.example.webApplication.Entity;
 
 public enum OrderStatus {
-    PENDING,
-    PAID,
-    SHIPPED
+    PENDING_CONFIRMATION,
+    AWAITING_PICKUP,
+    SHIPPING,
+    DELIVERED,
+    COMPLETED,
+    CANCELLED
 }
