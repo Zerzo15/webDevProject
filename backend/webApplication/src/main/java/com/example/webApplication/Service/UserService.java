@@ -28,8 +28,8 @@ public class UserService {
         this.authenticationManager = authenticationManager;
     }
 
-    //hash the password 7 times before saving it inside the db
-    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(7);
+    //hash the password 12 times before saving it inside the db
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     public UserDto registerUser(RegisterRequest request) throws Exception {
         User user = new User();
