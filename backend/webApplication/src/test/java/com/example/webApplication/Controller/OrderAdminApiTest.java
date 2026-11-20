@@ -281,6 +281,36 @@ class OrderAdminApiTest {
     }
 
     @Test
+    void theCustomerAndAnAdminCancellingTheSameOrderGiveTheStockBackOnlyOnce() throws Exception {
+        for (int round = 0; round < 5; round++) {
+            long id = placeOrder(alice, 3, null);
+            assertEquals(7, stock());
+
+            java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(2);
+            java.util.concurrent.CountDownLatch go = new java.util.concurrent.CountDownLatch(1);
+            java.util.concurrent.Future<Integer> byCustomer = pool.submit(() -> {
+                go.await();
+                return mvc.perform(post("/api/v1/orders/" + id + "/cancel").with(asCustomer(alice)))
+                        .andReturn().getResponse().getStatus();
+            });
+            java.util.concurrent.Future<Integer> byAdmin = pool.submit(() -> {
+                go.await();
+                return transition(admin, id, "CANCELLED", null).andReturn().getResponse().getStatus();
+            });
+            go.countDown();
+            int first = byCustomer.get();
+            int second = byAdmin.get();
+            pool.shutdown();
+
+            assertEquals(1, (first == 200 ? 1 : 0) + (second == 200 ? 1 : 0), "exactly one cancel must win: " + first + "/" + second);
+            assertEquals(1, (first == 409 ? 1 : 0) + (second == 409 ? 1 : 0), "the other one must be refused: " + first + "/" + second);
+            assertEquals(10, stock(), "stock must be given back once, round " + round);
+            assertEquals(1, jdbc.queryForObject(
+                    "select count(*) from order_status_history where order_id = ? and to_status = 'CANCELLED'", Integer.class, id));
+        }
+    }
+
+    @Test
     void aMissingTargetAndAnUnknownOrderAreRejected() throws Exception {
         long id = placeOrder(alice, 1, null);
 
