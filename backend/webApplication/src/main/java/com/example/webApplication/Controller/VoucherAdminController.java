@@ -6,6 +6,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -58,7 +60,9 @@ public class VoucherAdminController {
             @RequestParam(required = false) BigDecimal minOrderTo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(required = false) List<String> sort) {
+            HttpServletRequest request) {
+        // Read sort raw: binding a List would split "code,desc" at the comma.
+        List<String> sort = PagingSupport.rawSortParams(request);
         Pageable pageable = PagingSupport.pageable(page, size, sort, SORTABLE, Sort.by(Sort.Direction.DESC, "id"));
         VoucherFilter filter = new VoucherFilter(code, type, active, validFrom, validTo, minOrderFrom, minOrderTo);
         return ResponseEntity.ok(PageResponse.of(voucherService.search(filter, pageable), VoucherDto::from));

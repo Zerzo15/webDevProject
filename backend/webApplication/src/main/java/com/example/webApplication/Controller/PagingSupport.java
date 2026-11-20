@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,6 +22,12 @@ final class PagingSupport {
     static final Set<Integer> PAGE_SIZES = Set.of(10, 20, 50, 100);
 
     private PagingSupport() {
+    }
+
+    /** The values of every sort=... parameter, exactly as sent (not split at commas). */
+    static List<String> rawSortParams(HttpServletRequest request) {
+        String[] values = request.getParameterValues("sort");
+        return values == null ? List.of() : List.of(values);
     }
 
     static Pageable pageable(int page, int size, List<String> sorts, Set<String> allowedFields, Sort defaultSort) {
