@@ -51,7 +51,7 @@ public class OrderAutoCompleteService {
         for (Long id : ids) {
             try {
                 transaction.executeWithoutResult(status -> {
-                    Order order = orderRepo.findById(id).orElseThrow();
+                    Order order = orderRepo.findByIdForUpdate(id).orElseThrow();
                     orderService.changeStatus(order, OrderStatus.COMPLETED, OrderActor.SYSTEM, SYSTEM_NAME,
                             "Completed automatically: no confirmation within " + days + " days of delivery");
                 });

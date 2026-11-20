@@ -62,7 +62,8 @@ public class OrderAdminService {
         if (target == null) {
             throw new InvalidRequestException("target is required");
         }
-        Order order = find(orderId);
+        Order order = orderRepo.findByIdForUpdate(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order " + orderId + " does not exist"));
         String why = reason == null || reason.isBlank() ? null : reason.trim();
         orderService.changeStatus(order, target, actor, changedBy, why);
         return orderService.toDetail(find(orderId));

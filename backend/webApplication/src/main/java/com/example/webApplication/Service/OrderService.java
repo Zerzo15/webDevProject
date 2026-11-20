@@ -256,7 +256,7 @@ public class OrderService {
     /** The customer cancels an order. The state machine only allows this while it waits for confirmation. */
     @Transactional
     public OrderDetailDto cancelMine(User user, long orderId, String reason) {
-        Order order = findMine(user, orderId);
+        Order order = findMineForUpdate(user, orderId);
         String why = reason == null || reason.isBlank() ? "Cancelled by customer" : reason.trim();
         changeStatus(order, OrderStatus.CANCELLED, OrderActor.CUSTOMER, user.getEmail(), why);
         return toDetail(orderRepo.findById(orderId).orElseThrow());
@@ -265,7 +265,7 @@ public class OrderService {
     /** The customer confirms the goods arrived ("Da nhan"). */
     @Transactional
     public OrderDetailDto confirmReceived(User user, long orderId) {
-        Order order = findMine(user, orderId);
+        Order order = findMineForUpdate(user, orderId);
         changeStatus(order, OrderStatus.COMPLETED, OrderActor.CUSTOMER, user.getEmail(), "Customer confirmed receipt");
         return toDetail(orderRepo.findById(orderId).orElseThrow());
     }
@@ -273,6 +273,13 @@ public class OrderService {
     private Order findMine(User user, long orderId) {
         // An order of another user is reported as not found, not as forbidden.
         return orderRepo.findByIdAndUserId(orderId, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Order " + orderId + " does not exist"));
+    }
+
+    /** Like findMine, but locks the order row until the transaction ends (use before changing the status). */
+    private Order findMineForUpdate(User user, long orderId) {
+        return orderRepo.findByIdForUpdate(orderId)
+                .filter(order -> order.getUser().getId() == user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Order " + orderId + " does not exist"));
     }
 
