@@ -36,4 +36,12 @@ public class VoucherUsage {
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
+    public Voucher getVoucher() { return voucher; }
+    public void setVoucher(Voucher voucher) { this.voucher = voucher; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+    public Order getOrder() { return order; }
+    public void setOrder(Order order) { this.order = order; }
+    public Instant getUsedAt() { return usedAt; }
+    public void setUsedAt(Instant usedAt) { this.usedAt = usedAt; }
 }
