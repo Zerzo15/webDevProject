@@ -9,6 +9,7 @@ import static com.example.webApplication.Entity.OrderStatus.SHIPPING;
 import static com.example.webApplication.Service.OrderActor.ADMIN;
 import static com.example.webApplication.Service.OrderActor.CUSTOMER;
 import static com.example.webApplication.Service.OrderActor.STAFF;
+import static com.example.webApplication.Service.OrderActor.SYSTEM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -87,10 +88,19 @@ class OrderStateMachineTest {
     }
 
     @Test
-    void onlyCustomerCompletesDeliveredOrder() {
+    void customerAndSystemCompleteDeliveredOrder() {
         assertTrue(machine.canTransition(DELIVERED, COMPLETED, CUSTOMER));
+        assertTrue(machine.canTransition(DELIVERED, COMPLETED, SYSTEM));
         assertFalse(machine.canTransition(DELIVERED, COMPLETED, STAFF));
         assertFalse(machine.canTransition(DELIVERED, COMPLETED, ADMIN));
+    }
+
+    @Test
+    void systemCanOnlyCompleteDeliveredOrders() {
+        for (OrderStatus from : OrderStatus.values()) {
+            Set<OrderStatus> expected = from == DELIVERED ? Set.of(COMPLETED) : Set.of();
+            assertEquals(expected, machine.allowedTargets(from, SYSTEM), "from " + from);
+        }
     }
 
     // ---- invalid transitions ----
@@ -158,6 +168,7 @@ class OrderStateMachineTest {
         assertEquals(Set.of(), machine.allowedTargets(AWAITING_PICKUP, CUSTOMER));
         assertEquals(Set.of(DELIVERED), machine.allowedTargets(SHIPPING, STAFF));
         assertEquals(Set.of(COMPLETED), machine.allowedTargets(DELIVERED, CUSTOMER));
+        assertEquals(Set.of(COMPLETED), machine.allowedTargets(DELIVERED, SYSTEM));
         assertEquals(Set.of(), machine.allowedTargets(COMPLETED, ADMIN));
     }
 
