@@ -38,4 +38,18 @@ public interface VoucherRepo extends JpaRepository<Voucher, Long>, JpaSpecificat
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(value = "delete from vouchers where id = :id and deleted_at is not null", nativeQuery = true)
     int purge(@Param("id") long id);
+
+    /**
+     * Atomically takes one use of the voucher; the WHERE clause stops it at the usage limit.
+     *
+     * @return 1 on success, 0 when the voucher has no uses left (or does not exist)
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Voucher v set v.usedCount = v.usedCount + 1 where v.id = :id and v.usedCount < v.usageLimit")
+    int useOnce(@Param("id") long id);
+
+    /** Gives one use back (when an order that used the voucher is cancelled). */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = "update vouchers set used_count = used_count - 1 where id = :id and used_count > 0", nativeQuery = true)
+    int releaseOnce(@Param("id") long id);
 }
