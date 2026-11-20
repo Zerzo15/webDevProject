@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,6 +26,32 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
         return createErrorResponse(HttpStatus.CONFLICT, "User already exists", ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRequestException(InvalidRequestException ex) {
+        return createErrorResponse(HttpStatus.BAD_REQUEST, "Invalid request", ex.getMessage());
+    }
+
+    @ExceptionHandler(OutOfStockException.class)
+    public ResponseEntity<ErrorResponse> handleOutOfStockException(OutOfStockException ex) {
+        return createErrorResponse(HttpStatus.CONFLICT, "Out of stock", ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidVoucherException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidVoucherException(InvalidVoucherException ex) {
+        return createErrorResponse(HttpStatus.BAD_REQUEST, "Invalid voucher: " + ex.getReason(), ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalOrderTransitionException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalOrderTransitionException(IllegalOrderTransitionException ex) {
+        return createErrorResponse(HttpStatus.CONFLICT, "Illegal order transition", ex.getMessage());
+    }
+
+    // Without this handler a 403 raised by @PreAuthorize would be turned into a 500 by the catch-all below.
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
+        return createErrorResponse(HttpStatus.FORBIDDEN, "Access denied", "You do not have permission to do this");
     }
 
     @ExceptionHandler(Exception.class)
