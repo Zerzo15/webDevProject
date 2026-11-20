@@ -20,6 +20,7 @@ import static com.example.webApplication.Entity.OrderStatus.SHIPPING;
 import static com.example.webApplication.Service.OrderActor.ADMIN;
 import static com.example.webApplication.Service.OrderActor.CUSTOMER;
 import static com.example.webApplication.Service.OrderActor.STAFF;
+import static com.example.webApplication.Service.OrderActor.SYSTEM;
 
 /**
  * The only place allowed to change Order.status (proposal 6.1).
@@ -42,8 +43,9 @@ public class OrderStateMachine {
         allow(AWAITING_PICKUP, CANCELLED, STAFF, ADMIN);
         // From SHIPPING onward the order cannot be cancelled.
         allow(SHIPPING, DELIVERED, STAFF, ADMIN);
-        // The customer confirms receipt to complete the order.
-        allow(DELIVERED, COMPLETED, CUSTOMER);
+        // The customer confirms receipt to complete the order; SYSTEM completes it automatically
+        // when the customer does not confirm in time.
+        allow(DELIVERED, COMPLETED, CUSTOMER, SYSTEM);
         // COMPLETED and CANCELLED are final: no rules registered.
     }
 
