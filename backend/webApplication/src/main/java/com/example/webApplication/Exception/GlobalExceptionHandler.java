@@ -33,6 +33,11 @@ public class GlobalExceptionHandler {
         return createErrorResponse(HttpStatus.BAD_REQUEST, "Invalid request", ex.getMessage());
     }
 
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex) {
+        return createErrorResponse(HttpStatus.CONFLICT, "Conflict", ex.getMessage());
+    }
+
     @ExceptionHandler(OutOfStockException.class)
     public ResponseEntity<ErrorResponse> handleOutOfStockException(OutOfStockException ex) {
         return createErrorResponse(HttpStatus.CONFLICT, "Out of stock", ex.getMessage());
