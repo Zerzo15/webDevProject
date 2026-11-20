@@ -6,6 +6,7 @@ package com.example.webApplication.Exception;
 public class InvalidVoucherException extends RuntimeException {
 
     public enum Reason {
+        NOT_FOUND,
         INACTIVE,
         NOT_STARTED,
         EXPIRED,
