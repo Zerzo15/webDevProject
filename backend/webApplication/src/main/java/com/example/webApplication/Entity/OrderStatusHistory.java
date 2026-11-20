@@ -40,4 +40,16 @@ public class OrderStatusHistory {
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
+    public Order getOrder() { return order; }
+    public void setOrder(Order order) { this.order = order; }
+    public OrderStatus getFromStatus() { return fromStatus; }
+    public void setFromStatus(OrderStatus fromStatus) { this.fromStatus = fromStatus; }
+    public OrderStatus getToStatus() { return toStatus; }
+    public void setToStatus(OrderStatus toStatus) { this.toStatus = toStatus; }
+    public String getChangedBy() { return changedBy; }
+    public void setChangedBy(String changedBy) { this.changedBy = changedBy; }
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
+    public Instant getChangedAt() { return changedAt; }
+    public void setChangedAt(Instant changedAt) { this.changedAt = changedAt; }
 }
