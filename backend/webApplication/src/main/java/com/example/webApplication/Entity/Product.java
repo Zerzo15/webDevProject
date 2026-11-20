@@ -43,10 +43,6 @@ public class Product extends Auditable {
     @Column(name = "weight_grams", nullable = false)
     private int weightGrams = 0;
 
-    // Reference to Cloud Storage bucket URL
-    @Column(name = "image_url", length = 500)
-    private String imageUrl; 
-
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
@@ -76,8 +72,6 @@ public class Product extends Auditable {
     public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; }
     public int getWeightGrams() { return weightGrams; }
     public void setWeightGrams(int weightGrams) { this.weightGrams = weightGrams; }
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
     public Set<Tag> getTags() { return tags; }
