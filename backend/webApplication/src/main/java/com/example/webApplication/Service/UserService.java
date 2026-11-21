@@ -23,11 +23,17 @@ public class UserService {
     private final UserRepo userRepo;
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
+    private final RefreshTokenService refreshService;
     
-    public UserService(UserRepo userRepo, JWTService jwtService, AuthenticationManager authenticationManager) {
+    public UserService(
+            UserRepo userRepo, 
+            JWTService jwtService, 
+            AuthenticationManager authenticationManager, 
+            RefreshTokenService refreshService) {
         this.userRepo = userRepo;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.refreshService = refreshService;
     }
 
     //hash the password 12 times before saving it inside the db
@@ -97,12 +103,16 @@ public class UserService {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
+        //the username is actually user's email 
         String username = userDetails.getUsername();
 
         String role = userDetails.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
 
-        String token = jwtService.generateToken(username, role);
+        String acessToken = jwtService.generateToken(username, role);
+
+        //the user is verified, create a refresh and save it to the database for them before returning 
+        String refreshToken = refreshService.createToken(username);
         
-        return new TokenRespond(token);
+        return new TokenRespond(acessToken, refreshToken);
     }
 }
