@@ -32,6 +32,15 @@ public class RefreshToken {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
+    protected RefreshToken() {}
+
+    //builder
+    public  RefreshToken(User user, String token, Instant expiresAt) {
+        this.user = user;
+        this.tokenHash = token;
+        this.expiresAt = expiresAt;
+    }
+
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
     public User getUser() { return user; }
