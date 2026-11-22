@@ -42,7 +42,7 @@ public class SecurityConfiguration {
 
         httpSecurity.authorizeHttpRequests(request -> request
             //public
-            .requestMatchers("/api/user/register", "/api/user/login").permitAll()
+            .requestMatchers("/api/user/register", "/api/user/login", "/api/user/refresh-token").permitAll()
 
             //admin 
             //id:\\d+ this is the generic way to say, id only accept number

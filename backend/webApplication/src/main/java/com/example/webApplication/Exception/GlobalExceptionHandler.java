@@ -37,6 +37,11 @@ public class GlobalExceptionHandler {
         return createErrorResponse(HttpStatus.UNAUTHORIZED, "Invalid credentials", "Login ID or password is incorrect");
     }
 
+    @ExceptionHandler(RefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleRefreshTokenException(Exception ex) {
+        return createErrorResponse(HttpStatus.UNAUTHORIZED, "Refresh token expired", "Try login again");
+    }
+
     private ResponseEntity<ErrorResponse> createErrorResponse(HttpStatus status, String error, String message) {
         ErrorResponse errorResponse = new ErrorResponse(
                 Timestamp.valueOf(LocalDateTime.now()),

@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.webApplication.Dto.LoginRequest;
+import com.example.webApplication.Dto.RefreshTokenRequest;
 import com.example.webApplication.Dto.RegisterRequest;
 import com.example.webApplication.Dto.TokenRespond;
 import com.example.webApplication.Dto.UserDto;
+import com.example.webApplication.Service.RefreshTokenService;
 import com.example.webApplication.Service.UserService;
 
 @RestController
@@ -17,9 +19,11 @@ import com.example.webApplication.Service.UserService;
 public class UserController {
     
     private final UserService userService;
+    private final RefreshTokenService refreshService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, RefreshTokenService refreshService) {
         this.userService = userService;
+        this.refreshService = refreshService;
     }
 
     @PostMapping("/register")
@@ -33,4 +37,10 @@ public class UserController {
         TokenRespond successMessage = userService.loginUser(loginRequest);
         return ResponseEntity.ok(successMessage);
     }  
+
+    @PostMapping("/refresh-token")       
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+        TokenRespond sucess = refreshService.refreshToken(request);
+        return ResponseEntity.ok(sucess);
+    }
 }
