@@ -21,6 +21,9 @@ public class JWTService {
     @Value("${jwt.secret}")
     private String secretkey;
 
+    @Value("${jwt.access-expiration-ms}")
+    private long acessExpired;
+
     public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
@@ -30,7 +33,7 @@ public class JWTService {
                 .add(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24)) // 24 hours
+                .expiration(new Date(System.currentTimeMillis() + acessExpired)) // 15 minutes
                 .and()
                 .signWith(getKey())
                 .compact();

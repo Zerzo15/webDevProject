@@ -6,7 +6,7 @@ import java.util.Locale;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.webApplication.Dto.LoginRequest;
@@ -24,20 +24,20 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
     private final RefreshTokenService refreshService;
+    private final PasswordEncoder passwordEncoder;
     
     public UserService(
             UserRepo userRepo, 
             JWTService jwtService, 
             AuthenticationManager authenticationManager, 
-            RefreshTokenService refreshService) {
+            RefreshTokenService refreshService,
+            PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.refreshService = refreshService;
+        this.passwordEncoder = passwordEncoder;
     }
-
-    //hash the password 12 times before saving it inside the db
-    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     public UserDto registerUser(RegisterRequest request) {
         User user = new User();
@@ -80,7 +80,7 @@ public class UserService {
             throw new InvalidRegistrationException("Password must be longer than 8 characters");
         }
 
-        user.setPasswordHash(encoder.encode(password));
+        user.setPasswordHash(passwordEncoder.encode(password));
 
         user.setCreatedAt(Instant.now());
 
