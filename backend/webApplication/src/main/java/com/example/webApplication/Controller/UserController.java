@@ -1,6 +1,9 @@
 package com.example.webApplication.Controller;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,14 +36,47 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<TokenRespond> loginUser(@RequestBody LoginRequest loginRequest) {
         TokenRespond successMessage = userService.loginUser(loginRequest);
-        return ResponseEntity.ok(successMessage);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, refreshCookie(successMessage.refreshToken()).toString())
+            .body(successMessage);
     }  
 
     @PostMapping("/refresh-token")       
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
-        TokenRespond sucess = refreshService.refreshToken(request);
-        return ResponseEntity.ok(sucess);
+    public ResponseEntity<TokenRespond> refreshToken(
+            @CookieValue(name = "refresh_token", required = false) String rawToken) {
+        TokenRespond success = refreshService.refreshToken(new RefreshTokenRequest(rawToken));
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, refreshCookie(success.refreshToken()).toString())
+            .body(success);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @CookieValue(name = "refresh_token", required = false) String rawToken) {
+        if (rawToken != null && !rawToken.isBlank()) {
+            refreshService.logout(rawToken);
+        }
+
+        ResponseCookie clearCookie = ResponseCookie.from("refresh_token", "")
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Strict")
+            .path("/api/user")
+            .maxAge(0)
+            .build();
+        return ResponseEntity.noContent()
+            .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
+            .build();
+    }
+
+    private ResponseCookie refreshCookie(String token) {
+        return ResponseCookie.from("refresh_token", token)
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Strict")
+            .path("/api/user")
+            .build();
     }
 }

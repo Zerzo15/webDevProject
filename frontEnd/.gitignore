@@ -1,24 +1,66 @@
-# Logs
-logs
+# Build & Distribution
+dist/
+build/
+out/
+.cache/
+.parcel-cache/
+.vite/
+
+# Dependencies & Package Managers (if using tools like Live Server, Tailwind, etc.)
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnp.*
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Logs & Debug
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
+# Editors & IDEs
+.vscode/
 !.vscode/extensions.json
-.idea
-.DS_Store
+!.vscode/settings.json
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.sublime-workspace
+*.sublime-project
+
+# OS Generated Files
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Temporary & Backup Files
+*.tmp
+*.temp
+*.bak
+*.swp
