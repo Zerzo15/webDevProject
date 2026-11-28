@@ -27,18 +27,21 @@ public class UserService {
     private final JWTService jwtService;
     private final RefreshTokenService refreshService;
     private final PasswordEncoder passwordEncoder;
+    private final OtpService otpService;
     
     public UserService(
             UserRepo userRepo, 
             JWTService jwtService, 
             AuthenticationManager authenticationManager, 
             RefreshTokenService refreshService,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            OtpService otpService) {
         this.userRepo = userRepo;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.refreshService = refreshService;
         this.passwordEncoder = passwordEncoder;
+        this.otpService = otpService;
     }
 
     public UserDto registerUser(RegisterRequest request) {
@@ -84,9 +87,13 @@ public class UserService {
 
         user.setPasswordHash(passwordEncoder.encode(password));
 
+        user.setEmailVerified(false);
         user.setCreatedAt(Instant.now());
 
         User savedUser = userRepo.save(user);
+
+        //send the verification otp, if email delivery fails the user can request a new one
+        otpService.issueAndSendOtp(savedUser);
 
         return new UserDto(
             savedUser.getId(),
