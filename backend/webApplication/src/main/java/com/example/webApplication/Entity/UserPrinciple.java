@@ -38,7 +38,8 @@ public class UserPrinciple implements UserDetails{
 
     @Override
     public boolean isEnabled() {
-        return user.getAccountStatus() == AccountStatus.ACTIVE;
+        //an unverified email must not be able to authenticate
+        return user.getAccountStatus() == AccountStatus.ACTIVE && user.isEmailVerified();
     }
 
     //for this 2 function, we just include them because of the rules

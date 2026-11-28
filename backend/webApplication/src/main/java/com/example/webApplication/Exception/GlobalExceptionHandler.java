@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -40,6 +41,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RefreshTokenException.class)
     public ResponseEntity<ErrorResponse> handleRefreshTokenException(Exception ex) {
         return createErrorResponse(HttpStatus.UNAUTHORIZED, "Refresh token expired", "Try login again");
+    }
+
+    @ExceptionHandler(OtpException.class) 
+    public ResponseEntity<ErrorResponse> handleOtpException(Exception ex) {
+        return createErrorResponse(HttpStatus.BAD_REQUEST, "Invalid OTP validation", ex.getMessage());
+    }
+
+    @ExceptionHandler(EmailNotVerifyException.class)
+    public ResponseEntity<ErrorResponse> handleEmailNotVerifyException(Exception ex) {
+        return createErrorResponse(HttpStatus.FORBIDDEN, "EMAIL_NOT_VERIFIED", ex.getMessage());
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleDisabledException(Exception ex) {
+        return createErrorResponse(HttpStatus.FORBIDDEN, "EMAIL_NOT_VERIFIED", "Verify your email");
+    }
+
+    @ExceptionHandler(EmailDeliveryException.class)
+    public ResponseEntity<ErrorResponse> handleEmailDeliveryException(EmailDeliveryException ex) {
+        return createErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, "Email delivery failed", ex.getMessage());
     }
 
     private ResponseEntity<ErrorResponse> createErrorResponse(HttpStatus status, String error, String message) {

@@ -24,7 +24,7 @@ public class OtpCode {
     @Column(nullable = false, length = 150)
     private String email;
 
-    @Column(nullable = false, length = 60)
+    @Column(nullable = false, length = 64)
     private String code;
 
     @Column(name = "expires_at", nullable = false)
@@ -32,6 +32,9 @@ public class OtpCode {
 
     @Column(name = "used", nullable = false)
     private boolean used = false;
+
+    @Column(name = "attempts", nullable = false)
+    private int attempts = 0;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
@@ -48,6 +51,8 @@ public class OtpCode {
     public void setExpiresAt(Instant expiresAt) { this.expiresAt = expiresAt; }
     public boolean isUsed() { return used; }
     public void setUsed(boolean used) { this.used = used; }
+    public int getAttempts() { return attempts; }
+    public void setAttempts(int attempts) { this.attempts = attempts; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 }

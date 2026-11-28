@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.webApplication.Configuration.HashConfiguration;
 import com.example.webApplication.Dto.RefreshTokenRequest;
 import com.example.webApplication.Dto.TokenRespond;
+import com.example.webApplication.Entity.AccountStatus;
 import com.example.webApplication.Entity.RefreshToken;
 import com.example.webApplication.Entity.User;
 import com.example.webApplication.Exception.RefreshTokenException;
@@ -36,9 +37,11 @@ public class RefreshTokenService {
         //original token
         String token = UUID.randomUUID().toString();
 
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new RefreshTokenException("User not found"));
         RefreshToken refreshToken = new RefreshToken(
-            userRepo.findByEmail(email).get(), 
-            HashConfiguration.hash(token), //hashed using SHA-256
+            user,
+            HashConfiguration.hash(token), // hashed using SHA-256
             Instant.now().plusMillis(refreshExpired) // 7 days
         );
 
@@ -75,6 +78,10 @@ public class RefreshTokenService {
         verifyToken(oldToken);
 
         User user = oldToken.getUser();
+        if (user.getAccountStatus() == AccountStatus.LOCKED
+                || user.getDeletedAt() != null) {
+            throw new RefreshTokenException("User is not eligible to refresh tokens");
+        }
         oldToken.setRevoked(true);
         refreshRepo.save(oldToken);
 
@@ -89,17 +96,19 @@ public class RefreshTokenService {
 
     @Transactional(noRollbackFor = RefreshTokenException.class)
     public void logout(String rawToken) {
+        // Logout should be safe to repeat. The controller will clear the
+        // browser cookie even when the token is already absent or expired.
         if (rawToken == null || rawToken.isBlank()) {
-            throw new RefreshTokenException("Refresh token not found");
+            return;
         }
 
         String requestTokenHash = HashConfiguration.hash(rawToken);
-        RefreshToken oldToken = refreshRepo.findByTokenHash(requestTokenHash)
-            .map(this::verifyToken)
-            .orElseThrow(() -> new RefreshTokenException("Refresh token not found or expired"));
-
-        oldToken.setRevoked(true);
-        refreshRepo.save(oldToken);
+        refreshRepo.findByTokenHash(requestTokenHash).ifPresent(token -> {
+            if (!token.isRevoked()) {
+                token.setRevoked(true);
+                refreshRepo.save(token);
+            }
+        });
     }
 
     @Transactional

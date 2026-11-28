@@ -1,11 +1,13 @@
 import axios from 'axios';
 
 let accessToken: string | null = null;
-let refreshToken: string | null = null;
 
-export const setTokens = (access: string | null, refresh: string | null) => {
+// The refresh token is HttpOnly and must never be read by JavaScript.
+// The optional second argument is retained temporarily so existing login
+// callers do not need to change in the same small patch.
+export const setTokens = (access: string | null, _refresh?: string | null) => {
+  void _refresh;
   accessToken = access;
-  refreshToken = refresh;
 };
 
 const axiosClient = axios.create({
@@ -32,17 +34,22 @@ axiosClient.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
-    if (error.response?.status === 401 && !original._retry && refreshToken) {
+    if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
       try {
-        const { data } = await axios.post('/api/user/refresh-token', {
-          token: refreshToken,
-        });
-        setTokens(data.accessToken, data.refreshToken);
+        // Use the plain Axios client so a failed refresh does not recursively
+        // trigger this same response interceptor. The browser sends the
+        // HttpOnly refresh_token cookie because withCredentials is enabled.
+        const { data } = await axios.post(
+          '/api/user/refresh-token',
+          undefined,
+          { withCredentials: true },
+        );
+        setTokens(data.accessToken);
         original.headers.Authorization = `Bearer ${data.accessToken}`;
         return axiosClient(original);
       } catch (err) {
-        setTokens(null, null);
+        setTokens(null);
         window.location.href = '/login';
         return Promise.reject(err);
       }

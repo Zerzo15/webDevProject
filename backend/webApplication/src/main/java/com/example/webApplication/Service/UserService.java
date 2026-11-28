@@ -14,7 +14,9 @@ import com.example.webApplication.Dto.RegisterRequest;
 import com.example.webApplication.Dto.TokenRespond;
 import com.example.webApplication.Dto.UserDto;
 import com.example.webApplication.Entity.User;
+import com.example.webApplication.Exception.EmailNotVerifyException;
 import com.example.webApplication.Exception.InvalidRegistrationException;
+import com.example.webApplication.Exception.ResourceNotFoundException;
 import com.example.webApplication.Exception.UserAlreadyExistsException;
 import com.example.webApplication.Repository.UserRepo;
 
@@ -25,18 +27,21 @@ public class UserService {
     private final JWTService jwtService;
     private final RefreshTokenService refreshService;
     private final PasswordEncoder passwordEncoder;
+    private final OtpService otpService;
     
     public UserService(
             UserRepo userRepo, 
             JWTService jwtService, 
             AuthenticationManager authenticationManager, 
             RefreshTokenService refreshService,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            OtpService otpService) {
         this.userRepo = userRepo;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.refreshService = refreshService;
         this.passwordEncoder = passwordEncoder;
+        this.otpService = otpService;
     }
 
     public UserDto registerUser(RegisterRequest request) {
@@ -82,9 +87,13 @@ public class UserService {
 
         user.setPasswordHash(passwordEncoder.encode(password));
 
+        user.setEmailVerified(false);
         user.setCreatedAt(Instant.now());
 
         User savedUser = userRepo.save(user);
+
+        //send the verification otp, if email delivery fails the user can request a new one
+        otpService.issueAndSendOtp(savedUser);
 
         return new UserDto(
             savedUser.getId(),
@@ -105,6 +114,13 @@ public class UserService {
 
         //the username is actually user's email 
         String username = userDetails.getUsername();
+
+        User user = userRepo.findByEmail(username)
+            .orElseThrow(() -> new ResourceNotFoundException("username"));
+
+        if (!user.isEmailVerified()) {
+            throw new EmailNotVerifyException("Verify your email");
+        }
 
         String role = userDetails.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
 
