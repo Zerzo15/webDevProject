@@ -19,12 +19,14 @@ public interface OtpRepo extends JpaRepository<OtpCode, Long>{
 
     Optional<OtpCode> findByCode(String code);
 
+    Optional<OtpCode> findTopByEmailOrderByCreatedAtDesc(String email);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<OtpCode> findTopByEmailAndUsedFalseOrderByCreatedAtDesc(String email);
 
     @Modifying
-    @Query("UPDATE OtpCode o SET o.used = true WHERE o.email = :email AND o.used = false")
-    int invalidateAllUnusedByEmail(@Param("email") String email);
+    @Query("DELETE FROM OtpCode o WHERE o.email = :email AND o.id <> :keepId")
+    int deleteOtherCodesForEmail(@Param("email") String email, @Param("keepId") Long keepId);
 
     void deleteByExpiresAtBefore(Instant now);
 }

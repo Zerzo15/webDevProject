@@ -34,11 +34,11 @@ public class OtpService {
     @Value("${otp.expiration-min}")
     private int otpExpiration;
 
-    @Value("${otp.resend-cooldown-min}")
-    private int otpResend;
-
     @Value("${otp.secret}")
     private String otpSecret;
+
+    @Value("${otp.resend-cooldown-min}")
+    private int otpResend;
 
     @Value("${otp.max-attempts:5}")
     private int maxAttempts;
@@ -52,8 +52,8 @@ public class OtpService {
     private final SecureRandom secureRandom = new SecureRandom();
 
     /**
-     * Creates a new OTP for the user, replaces any previous unused code and emails it.
-     * This is what registration and resend both go through.
+     * Creates a new OTP for the user, emails it, then deletes every older code for
+     * that email. Registration and resend both go through this.
      */
     @Transactional(noRollbackFor = EmailDeliveryException.class)
     public void issueAndSendOtp(User user) {
@@ -62,7 +62,6 @@ public class OtpService {
         }
 
         String normalizedEmail = normalizeEmail(user.getEmail());
-        otpRepo.invalidateAllUnusedByEmail(normalizedEmail);
 
         String rawCode = generateRawCode();
         OtpCode savedOtp = createOtp(user, normalizedEmail, rawCode);
@@ -75,6 +74,10 @@ public class OtpService {
             otpRepo.save(savedOtp);
             throw ex;
         }
+
+        // the new code is live and delivered, so every earlier code for this
+        // email is both invalid and removed from the database
+        otpRepo.deleteOtherCodesForEmail(normalizedEmail, savedOtp.getId());
     }
 
     @Transactional(noRollbackFor = EmailDeliveryException.class)
@@ -165,7 +168,9 @@ public class OtpService {
             return;
         }
 
-        otpRepo.findTopByEmailAndUsedFalseOrderByCreatedAtDesc(normalizedEmail).ifPresent(latest -> {
+        // newest row regardless of state, so burning a code on failed attempts
+        // cannot be used to skip the cooldown
+        otpRepo.findTopByEmailOrderByCreatedAtDesc(normalizedEmail).ifPresent(latest -> {
             Instant availableAt = latest.getCreatedAt().plus(otpResend, ChronoUnit.MINUTES);
             if (availableAt.isAfter(Instant.now())) {
                 throw new OtpException("Please wait " + otpResend + " minute(s) before requesting a new otp code");
