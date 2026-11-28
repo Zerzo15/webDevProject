@@ -1,0 +1,5 @@
+ALTER TABLE otp_codes
+    MODIFY COLUMN code VARCHAR(64) NOT NULL;
+
+ALTER TABLE otp_codes
+    ADD COLUMN attempts INT NOT NULL DEFAULT 0;

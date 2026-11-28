@@ -42,6 +42,16 @@ public class GlobalExceptionHandler {
         return createErrorResponse(HttpStatus.UNAUTHORIZED, "Refresh token expired", "Try login again");
     }
 
+    @ExceptionHandler(OtpException.class) 
+    public ResponseEntity<ErrorResponse> handleOtpException(Exception ex) {
+        return createErrorResponse(HttpStatus.BAD_REQUEST, "Invalid OTP validation", ex.getMessage());
+    }
+
+    @ExceptionHandler(EmailNotVerifyException.class)
+    public ResponseEntity<ErrorResponse> handleEmailNotVerifyException(Exception ex) {
+        return createErrorResponse(HttpStatus.UNAUTHORIZED, "Unverify user", "Verify your email");
+    }
+
     private ResponseEntity<ErrorResponse> createErrorResponse(HttpStatus status, String error, String message) {
         ErrorResponse errorResponse = new ErrorResponse(
                 Timestamp.valueOf(LocalDateTime.now()),

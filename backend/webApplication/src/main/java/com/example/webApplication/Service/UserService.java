@@ -14,7 +14,9 @@ import com.example.webApplication.Dto.RegisterRequest;
 import com.example.webApplication.Dto.TokenRespond;
 import com.example.webApplication.Dto.UserDto;
 import com.example.webApplication.Entity.User;
+import com.example.webApplication.Exception.EmailNotVerifyException;
 import com.example.webApplication.Exception.InvalidRegistrationException;
+import com.example.webApplication.Exception.ResourceNotFoundException;
 import com.example.webApplication.Exception.UserAlreadyExistsException;
 import com.example.webApplication.Repository.UserRepo;
 
@@ -105,6 +107,13 @@ public class UserService {
 
         //the username is actually user's email 
         String username = userDetails.getUsername();
+
+        User user = userRepo.findByEmail(username)
+            .orElseThrow(() -> new ResourceNotFoundException("username"));
+
+        if (!user.isEmailVerified()) {
+            throw new EmailNotVerifyException("Verify your email");
+        }
 
         String role = userDetails.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
 

@@ -3,6 +3,7 @@ package com.example.webApplication.Controller;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,9 @@ public class UserController {
     
     private final UserService userService;
     private final RefreshTokenService refreshService;
+
+    @Value("${security.refresh-cookie-secure:true}")
+    private boolean refreshCookieSecure;
 
     public UserController(UserService userService, RefreshTokenService refreshService) {
         this.userService = userService;
@@ -61,7 +65,7 @@ public class UserController {
 
         ResponseCookie clearCookie = ResponseCookie.from("refresh_token", "")
             .httpOnly(true)
-            .secure(true)
+            .secure(refreshCookieSecure)
             .sameSite("Strict")
             .path("/api/user")
             .maxAge(0)
@@ -74,7 +78,7 @@ public class UserController {
     private ResponseCookie refreshCookie(String token) {
         return ResponseCookie.from("refresh_token", token)
             .httpOnly(true)
-            .secure(true)
+            .secure(refreshCookieSecure)
             .sameSite("Strict")
             .path("/api/user")
             .build();
