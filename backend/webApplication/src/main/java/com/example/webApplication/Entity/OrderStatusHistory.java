@@ -38,6 +38,24 @@ public class OrderStatusHistory {
     @Column(name = "changed_at", nullable = false, updatable = false)
     private Instant changedAt = Instant.now();
 
+    protected OrderStatusHistory() {}
+
+    public OrderStatusHistory(Order order, OrderStatus fromStatus, OrderStatus toStatus,
+                              String changedBy, String reason) {
+        this.order = order;
+        this.fromStatus = fromStatus;
+        this.toStatus = toStatus;
+        this.changedBy = changedBy;
+        this.reason = reason;
+    }
+
+    public Order getOrder() { return order; }
+    public OrderStatus getFromStatus() { return fromStatus; }
+    public OrderStatus getToStatus() { return toStatus; }
+    public String getChangedBy() { return changedBy; }
+    public String getReason() { return reason; }
+    public Instant getChangedAt() { return changedAt; }
+
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
 }
